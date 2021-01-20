@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="node_modules/xterm/css/xterm.css" />
+    <script src="node_modules/xterm/lib/xterm.js"></script>
+    <meta charset="UTF-8">
+    <title>Electerminal</title>
+    <style>
+        table { border-collapse: collapse; }
+        table, th, td { border: 1px solid black; }
+    </style>
+</head>
+
+<body>
+    <h1>Electerminal</h1>
+
+    We are using Node.js <span id="node-version"></span>, Chromium <span id="chrome-version"></span>, Electron <span id="electron-version"></span>, and Serialport <span id="serialport-version"></span>
+
+    <div id="error"></div>
+    Port: <select id="selectCom">
+    </select>
+    Baud: <select id="selectBaud">
+        <option>9600</option>
+        <option>14400</option>
+        <option>19200</option>
+        <option>38400</option>
+        <option>57600</option>
+        <option>115200</option>
+        <option>230400</option>
+        <option>460800</option>
+    </select>
+    Echo: <input type="checkbox" id="echoBox" onclick="changeEcho(this)">
+    Logging: <input type="checkbox" id="logBox" onclick="changeLog(this)">
+    Connected: <input type="checkbox" id="connectBox" onclick="changeConnect(this)">
+    <div id="terminal"></div>
+</body>
+
+<script src="./renderer.js"></script>
+
+</html>

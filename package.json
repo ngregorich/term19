@@ -1,0 +1,29 @@
+{
+    "name": "electron-serialport",
+    "version": "1.0.1",
+    "description": "A minimal Electron application with node serialport",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "install": "electron-rebuild"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:ngregorich/electerminal.git"
+    },
+    "keywords": [
+        "Electron",
+        "serial",
+        "terminal"
+    ],
+    "author": "Nicholas Gregorich",
+    "license": "MIT",
+    "devDependencies": {
+        "electron": "^5.0.5",
+        "electron-rebuild": "^1.8.5"
+    },
+    "dependencies": {
+        "serialport": "^9.0.0",
+        "xterm": "^4.9.0"
+    }
+}

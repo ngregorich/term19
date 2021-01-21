@@ -1,7 +1,7 @@
 {
-    "name": "electron-serialport",
+    "name": "terminal",
     "version": "1.0.1",
-    "description": "A minimal Electron application with node serialport",
+    "description": "A minimal Electron serial terminal",
     "main": "main.js",
     "scripts": {
         "start": "electron .",
@@ -9,7 +9,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "git@github.com:ngregorich/electerminal.git"
+        "url": "git@github.com:ngregorich/terminal.git"
     },
     "keywords": [
         "Electron",
@@ -23,6 +23,7 @@
         "electron-rebuild": "^1.8.5"
     },
     "dependencies": {
+        "electron-store": "^6.0.1",
         "serialport": "^9.0.0",
         "xterm": "^4.9.0"
     }

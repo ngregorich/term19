@@ -3,9 +3,10 @@
 
 <head>
     <link rel="stylesheet" href="node_modules/xterm/css/xterm.css" />
+    <link rel="stylesheet" href="main.css" />
     <script src="node_modules/xterm/lib/xterm.js"></script>
     <meta charset="UTF-8">
-    <title>Electerminal</title>
+    <title>Terminal</title>
     <style>
         table { border-collapse: collapse; }
         table, th, td { border: 1px solid black; }
@@ -13,14 +14,16 @@
 </head>
 
 <body>
-    <h1>Electerminal</h1>
-
-    We are using Node.js <span id="node-version"></span>, Chromium <span id="chrome-version"></span>, Electron <span id="electron-version"></span>, and Serialport <span id="serialport-version"></span>
-
     <div id="error"></div>
-    Port: <select id="selectCom">
+    <div class="settingsBar">
+    <!-- <span class=reload>&#x21bb;</span> -->
+    <button class=reload onclick="refreshPorts()">&#x21bb;</button>
+    Port: <select id="portSelect" onchange="changePort()">
     </select>
-    Baud: <select id="selectBaud">
+    Baud: <select id="baudSelect" onchange="changeBaud()">
+        <option>1200</option>
+        <option>2400</option>
+        <option>4800</option>
         <option>9600</option>
         <option>14400</option>
         <option>19200</option>
@@ -30,9 +33,17 @@
         <option>230400</option>
         <option>460800</option>
     </select>
+    Enter: <select id="enterSelect" onchange="changeEnter()">
+        <option>CR</option>
+        <option>LF</option>
+        <option>CRLF</option>
+        <option>LFCR</option>
+    </select>
     Echo: <input type="checkbox" id="echoBox" onclick="changeEcho(this)">
-    Logging: <input type="checkbox" id="logBox" onclick="changeLog(this)">
-    Connected: <input type="checkbox" id="connectBox" onclick="changeConnect(this)">
+    <!-- Buffer: <input type="checkbox" id="bufferBox" onclick="changeBuffer(this)"> -->
+    Log: <input type="checkbox" id="logBox" onclick="changeLog(this)">
+    Connect: <input type="checkbox" id="connectBox" onclick="changeConnect(this)">
+</div>
     <div id="terminal"></div>
 </body>
 

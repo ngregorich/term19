@@ -1,0 +1,14 @@
+.settingsBar {
+  font-family: Arial;
+  font-size: small;
+}
+
+.reload {
+  background-color: white;
+  border: none;
+  color: black;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: small;
+}

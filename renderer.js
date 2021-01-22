@@ -5,6 +5,7 @@
 const Store = require('electron-store');
 const SerialPort = require('serialport')
 const Readline = require('@serialport/parser-readline')
+var fs = require('fs')
 
 // global for access in multiple functions
 const store = new Store();
@@ -15,6 +16,7 @@ var logOn = false;
 var echoOn = false;
 var enterStr = ''
 var term = new Terminal();
+var logBuf = ''
 
 function listPorts() {
   // for each serial port detected
@@ -30,40 +32,20 @@ function listPorts() {
       console.log(port.manufacturer);
 
       // add port path to serial selector
-      var el = document.createElement("option");
+      var el = document.createElement('option');
       el.textContent = port.path;
       el.value = port.path;
       select.appendChild(el);
     });
-    for (i = 0; i < select.length; i++) {
-      console.log(select.options[i].value);
-    }
+    // TODO 21JAN2021 add loopback?
+
+    // after ports are listed, now restore all persistent settings
+    restoreSettings();
   });
-  // 20 JAN 2021 - looking at javascript then promise to load list before loading previous selected
-  console.log(store.get('port'));
-  document.getElementById('portSelect').value = store.get('port');
-  restoreSettings();
 }
 
-// // get selected serial port
-// function getSelPort() {
-//   selectedPort = document.getElementById('portSelect').value;
-  
-//   return selectedPort;
-// }
-
-// // get selected baud
-// function getBaud() {
-//   selectedBaud = document.getElementById('baudSelect').value;
-  
-//   return parseInt(selectedBaud);
-// }
-
-// get selected enter
-function getEnter() {
-  selectedEnter = document.getElementById('enterSelect').value;
-  store.set('enter', selectedEnter);
-  switch (selectedEnter) {
+function enterTranslator(enterUi) {
+  switch (enterUi) {
     case 'CR':
       return '\r';
     case 'LF':
@@ -77,34 +59,45 @@ function getEnter() {
   }
 }
 
+// get selected enter
+function getEnter() {
+  selectedEnter = document.getElementById('enterSelect').value;
+  store.set('enter', selectedEnter);
+  return enterTranslator(selectedEnter);
+}
+
 // called when enter select changes
 function refreshPorts() {
   listPorts()
-  // term.focus();
+  term.focus();
 }
 
 // called when port select changes
 function changePort() {
+  clearErrors();
   portStr = document.getElementById('portSelect').value;
   store.set('port', portStr);
-  // term.focus();
+  term.focus();
 }
 
 // called when baud select changes
 function changeBaud() {
+  clearErrors();
   baudNum = parseInt(document.getElementById('baudSelect').value);
   store.set('baud', baudNum);
-  // term.focus();
+  term.focus();
 }
 
 // called when enter select changes
 function changeEnter() {
+  clearErrors();
   enterStr = getEnter();
   term.focus();
 }
 
 // called when echo checkbox changes
 function changeEcho(checkbox) {
+  clearErrors();
   if (checkbox.checked) {
     echoOn = true;
   }
@@ -118,6 +111,7 @@ function changeEcho(checkbox) {
 
 // called when log checkbox changes
 function changeLog(checkbox) {
+  clearErrors();
   if (checkbox.checked) {
     logOn = true;
   }
@@ -128,69 +122,55 @@ function changeLog(checkbox) {
   term.focus();
 }
 
+function clearErrors() {
+  document.getElementById('errorOut').textContent='';
+  document.getElementById('errorOut').className='settingsBar';
+}
+
 function restoreSettings() {
-  // console.log('trying to load: ' + store.get('port'));
-  // document.getElementById('portSelect').value = store.get('port');
+  document.getElementById('portSelect').value = store.get('port');
   document.getElementById('baudSelect').value = store.get('baud');
   document.getElementById('enterSelect').value = store.get('enter');
   document.getElementById('echoBox').checked = store.get('echo');
   document.getElementById('logBox').checked = store.get('log');
-  // console.log(store.get('port'))
+  portStr = document.getElementById('portSelect').value;
+  baudNum = parseInt(document.getElementById('baudSelect').value);
+  enterStr = enterTranslator();
+  echoOn = document.getElementById('echoBox').checked;
+  logOn = document.getElementById('logBox').checked;
+  term.focus();
 }
 
 // called when connect checkbox changes
 function changeConnect(checkbox) {
+  clearErrors();
   if (checkbox.checked) {
-    // portStr = getSelPort()
-    // baudNum = getBaud()
-
     port = new SerialPort(portStr, { autoOpen: true, baudRate: baudNum })
+
     port.on('error', function (err) { console.log('Error: ', err.message) })
-    console.log('Opened ' + portStr + ' @ ' + baudNum)
-
-    term.focus();
-
-    // port.write(stringToTx);
-    // console.log('tx: ' + stringToTx);
-
-    port.on('data', function (data) {
-      // console.log('Data:', data)
-      term.write(data);
+    port.on('close', function (err) {
+      document.getElementById('errorOut').textContent='Error: ' + portStr + ' not available';
+      document.getElementById('errorOut').className='settingsError';
+      document.getElementById('connectBox').checked = false;
+      console.log('uncaughtException: ', err.message);
+      console.log('Error: ' + portStr + ' not available');
     })
 
-    // parser creates event every time a \n newline is detected
-    // const parser = port.pipe(new Readline({ delimiter: '\n' }))
+    // TODO shows opened even if failed
+    console.log('Opened ' + portStr + ' @ ' + baudNum)
+    term.focus();
 
-    // when parser creates an event
-    // parser.on('data', data => {
-    //   term.write(data);
-    //   // log received string to console
-    //   console.log('rx: ' + data);
-    // });
-
-    // parser.on('data', data => {
-    //   if (logOn) {
-    //     now = new Date().getTime()
-    //     temp = now + ',' + data + '\n'
-    //     fs.appendFile('log.csv', temp, function (err) {
-    //       if (err) throw err;
-    //     });
-    //   }
-    // })
+    port.on('data', function (data) {
+      term.write(data);
+    })
   }
   else {
     port.close()
     port = null;
-    console.log('Closed ' + selPort + ' @ ' + selBaud);
+    console.log('Closed ' + portStr + ' @ ' + baudNum);
   }
 }
 
-term.open(document.getElementById('terminal'));
-// term.write('Hello from \x1B[1;3;31mTerminal\x1B[0m $ ')
-
-function prompt(term) {
-  term.write('\r\n');
-}
 
 term.onData(e => {
   switch (e) {
@@ -201,31 +181,46 @@ term.onData(e => {
     // case '\u007F': // Backspace (DEL)
     //   // Do not delete the prompt
     //   if (term._core.buffer.x > 2) {
-    //     term.write('\b \b');
-    //   }
-    //   break;
-    default: // Print all other characters for demo
-      // term.write(e);
+      //     term.write('\b \b');
+      //   }
+      //   break;
+      default: // Print all other characters for demo
       if (port === null) {
+        document.getElementById('errorOut').textContent='Error: not connected';
+        document.getElementById('errorOut').className='settingsError';
         console.log('Error: not connected')
       }
       else {
         if (e == '\r') {
+          // TODO 21JAN2021 desire buffer to log
           port.write(enterStr);
-          // prompt(term);
+          console.log(logOn)
+          if (logOn) {
+            now = new Date().getTime()
+            temp = now + ',' + logBuf + '\r\n';
+            fs.appendFile('log.csv', temp, function (err) {
+              if (err) throw err;
+            });
+          }
+          logBuf = '';
+        }
+        else if (e == '\u007f') { // backspace
+          if (term._core.buffer.x > 0) { // if any characters in line buffer
+              term.write('\b \b');
+            }
         }
         else {
           port.write(e)
           if (echoOn) {
             term.write(e)
           }
+          logBuf += e;
         }
       }
-  }
-});
-
-// list available ports to console
-listPorts();
-// restoreSettings();
-// changeBaud();
-// changeEnter();
+    }
+  });
+  
+  term.open(document.getElementById('terminal'));
+  listPorts();
+  
+  

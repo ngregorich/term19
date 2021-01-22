@@ -2,6 +2,11 @@
   font-family: Arial;
   font-size: small;
 }
+.settingsError {
+  font-family: Arial;
+  font-size: small;
+  color: red;
+}
 
 .reload {
   background-color: white;

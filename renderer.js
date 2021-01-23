@@ -17,6 +17,60 @@ var echoOn = false;
 var enterStr = ''
 var term = new Terminal();
 var logBuf = ''
+var isConnected = false
+
+const { remote } = require('electron')
+const { Menu, MenuItem } = remote
+
+const menu = new Menu()
+menu.append(new MenuItem({
+  label: 'File',
+  submenu: [{
+    label: 'Quit',
+    role: 'quit',
+    accelerator: process.platform === 'darwin' ? 'cmd+shift+q' : 'ctrl+shift+q'
+  }]
+}))
+menu.append(new MenuItem({
+  label: 'Edit',
+  submenu: [{
+    label: 'Copy',
+    role: 'copy',
+    accelerator: process.platform === 'darwin' ? 'cmd+shift+c' : 'ctrl+shift+c'},
+    {label: 'Paste',
+    role: 'paste',
+    accelerator: process.platform === 'darwin' ? 'cmd+shift+v' : 'ctrl+shift+v',
+  }]
+}))
+menu.append(new MenuItem({
+  label: 'Terminal',
+  submenu: [{
+    label: 'Start / Stop',
+    click() { 
+        if (document.getElementById('connectBox').checked) {
+          document.getElementById('connectBox').checked = false;
+        }
+        else {
+          document.getElementById('connectBox').checked = true;
+        }
+        term.focus()
+        changeConnect(document.getElementById('connectBox'));
+        // NAG 22 JAN 2021 needs focus after key command, needs 
+     },
+    accelerator: process.platform === 'darwin' ? 'cmd+shift+s' : 'ctrl+shift+s',
+  }]
+}))
+
+Menu.setApplicationMenu(menu)
+
+term.attachCustomKeyEventHandler(function (e) {
+  // Ctrl + Shift + C
+  if (e.ctrlKey && e.shiftKey && (e.keyCode == 3)) {
+    var copySucceeded = document.execCommand('copy');
+    // console.log('copy succeeded', copySucceeded);
+    return false;
+  }
+});
 
 function listPorts() {
   // for each serial port detected
@@ -146,14 +200,17 @@ function changeConnect(checkbox) {
   clearErrors();
   if (checkbox.checked) {
     port = new SerialPort(portStr, { autoOpen: true, baudRate: baudNum })
+    isConnected = true
 
     port.on('error', function (err) { console.log('Error: ', err.message) })
     port.on('close', function (err) {
+      if (isConnected) {
       document.getElementById('errorOut').textContent='Error: ' + portStr + ' not available';
       document.getElementById('errorOut').className='settingsError';
       document.getElementById('connectBox').checked = false;
-      console.log('uncaughtException: ', err.message);
-      console.log('Error: ' + portStr + ' not available');
+        console.log('uncaughtException: ', err.message);
+        console.log('Error: ' + portStr + ' not available');
+      }
     })
 
     // TODO shows opened even if failed
@@ -165,7 +222,8 @@ function changeConnect(checkbox) {
     })
   }
   else {
-    port.close()
+    isConnected = false;
+    port.close();
     port = null;
     console.log('Closed ' + portStr + ' @ ' + baudNum);
   }

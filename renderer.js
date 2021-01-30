@@ -22,6 +22,7 @@ var isConnected = false
 const { remote } = require('electron')
 const { Menu, MenuItem } = remote
 
+// build Edit menu with copy and paste, with key commands
 const menu = new Menu()
 menu.append(new MenuItem({
   label: 'File',
@@ -44,6 +45,8 @@ menu.append(new MenuItem({
     accelerator: process.platform === 'darwin' ? 'cmd+shift+v' : 'ctrl+shift+v',
   }]
 }))
+
+// build Terminal menu with UI settings, with key commands
 menu.append(new MenuItem({
   label: 'Terminal',
   submenu: [{
@@ -93,7 +96,6 @@ menu.append(new MenuItem({
       }
       term.focus()
       changeEcho(document.getElementById('logBox'));
-      // NAG 22 JAN 2021 needs focus after key command, needs 
     },
     accelerator: process.platform === 'darwin' ? 'cmd+shift+e' : 'ctrl+shift+e',
 
@@ -102,18 +104,20 @@ menu.append(new MenuItem({
 
 Menu.setApplicationMenu(menu)
 
+// required to fix current copy key command
+// TODO 30JAN2021 this may not have fixed darwin / Mac
 term.attachCustomKeyEventHandler(function (e) {
   // Ctrl + Shift + C
   if (e.ctrlKey && e.shiftKey && (e.keyCode == 3)) {
     var copySucceeded = document.execCommand('copy');
-    // console.log('copy succeeded', copySucceeded);
     return false;
   }
 });
 
+// TODO 30JAN2021 can / should a port disconnect call listPorts? 
 function listPorts() {
-  // print header to term
-  term.write('\x1B[2mserial ports detected:\r\n')
+  // print to terminal, we are going to list available ports
+  term.write('\x1B[2mserial ports available:\r\n')
   // for each serial port detected
   SerialPort.list().then(ports => {
     var select = document.getElementById('portSelect');
@@ -121,12 +125,13 @@ function listPorts() {
       select.remove(0);
     }
     ports.forEach(function (port) {
+      // TODO 30JAN2021 which console msgs are useful (info printed to terminal here)
       // log port information to console
       console.log(port.path);
       console.log(port.pnpId);
       console.log(port.manufacturer);
 
-      // print port to term
+      // print available port info to term
       term.write('\r\n');
       term.write(port.path);
       term.write(' ');
@@ -141,14 +146,16 @@ function listPorts() {
       el.value = port.path;
       select.appendChild(el);
     });
+    // turn font back to white / normal
     term.write('\x1B[0m\r\n');
-    // TODO 21JAN2021 add loopback?
+    // TODO 21JAN2021 add loopback port for demo / debug?
 
     // after ports are listed, now restore all persistent settings
     restoreSettings();
   });
 }
 
+// convert user facing enter nomenclature to escaped characters
 function enterTranslator(enterUi) {
   switch (enterUi) {
     case 'CR':
@@ -167,25 +174,28 @@ function enterTranslator(enterUi) {
 // get selected enter
 function getEnter() {
   selectedEnter = document.getElementById('enterSelect').value;
+  // persistent store of selection
   store.set('enter', selectedEnter);
   return enterTranslator(selectedEnter);
 }
 
-// called when enter select changes
+// called by ui (html button or menu)
 function refreshPorts() {
   listPorts()
+  // always try to keep actual terminal in focus, ready to accept user input
   term.focus();
 }
 
-// called when port select changes
+// called when user changes port
 function changePort() {
+  // clears red any red error text next to stop / start checkbox
   clearErrors();
   portStr = document.getElementById('portSelect').value;
   store.set('port', portStr);
   term.focus();
 }
 
-// called when baud select changes
+// called when user changes baud
 function changeBaud() {
   clearErrors();
   baudNum = parseInt(document.getElementById('baudSelect').value);
@@ -193,9 +203,10 @@ function changeBaud() {
   term.focus();
 }
 
-// called when enter select changes
+// called when user changes enter type
 function changeEnter() {
   clearErrors();
+  // gets enter choice (CR, LF, etc)
   enterStr = getEnter();
   term.focus();
 }
@@ -227,11 +238,13 @@ function changeLog(checkbox) {
   term.focus();
 }
 
+// clears red text errors next to start / stop checkbox
 function clearErrors() {
   document.getElementById('errorOut').textContent = '';
   document.getElementById('errorOut').className = 'settingsBar';
 }
 
+// restores persistent settings from electron-store storage
 function restoreSettings() {
   document.getElementById('portSelect').value = store.get('port');
   document.getElementById('baudSelect').value = store.get('baud');
@@ -239,6 +252,7 @@ function restoreSettings() {
   document.getElementById('echoBox').checked = store.get('echo');
   document.getElementById('logBox').checked = store.get('log');
   portStr = document.getElementById('portSelect').value;
+  // returns int of stored baud string
   baudNum = parseInt(document.getElementById('baudSelect').value);
   enterStr = enterTranslator();
   echoOn = document.getElementById('echoBox').checked;
@@ -249,86 +263,115 @@ function restoreSettings() {
 // called when connect checkbox changes
 function changeConnect(checkbox) {
   clearErrors();
+  // if trying to connect
   if (checkbox.checked) {
+    // create new node serialport, at user baud rate, automatically opened
     port = new SerialPort(portStr, { autoOpen: true, baudRate: baudNum })
+    // TODO 30JAN2021 this should likely go in a port.on('open' callback
+    // this is set to false when user disconnects port
     isConnected = true
 
+    // TODO 30JAN2021 add user facing error msg to callback
     port.on('error', function (err) { console.log('Error: ', err.message) })
+    // when port is closed by user or disconnected port
     port.on('close', function (err) {
+      // if port should be connected (user has started but not stopped connection)
       if (isConnected) {
+        // show red error text next to start / stop check box
         document.getElementById('errorOut').textContent = 'Error: ' + portStr + ' not available';
         document.getElementById('errorOut').className = 'settingsError';
+        // force start / stop checkbox to stop (false)
         document.getElementById('connectBox').checked = false;
+        // TODO 30JAN2021 is this still needed when info presented to user in html
         console.log('uncaughtException: ', err.message);
         console.log('Error: ' + portStr + ' not available');
       }
     })
 
-    // TODO shows opened even if failed
+    // TODO 30JAN2021 this should likely go in a port.on('open callback
     console.log('Opened ' + portStr + ' @ ' + baudNum)
     term.focus();
 
+    // when serialport receives data, show data on terminal
     port.on('data', function (data) {
       term.write(data);
     })
   }
+  // if checkbox is now set to stop (unchecked)
   else {
+    // must set isConnected to false before closing serialport
     isConnected = false;
+    // close serialport connection
     port.close();
+    // set port to null so that next connection can be to a different path (serialport.js speak for port)
     port = null;
     console.log('Closed ' + portStr + ' @ ' + baudNum);
   }
 }
 
-
+// upon new data to terminal
+// TODO 30JAN2021 refactor e variable to a better name
 term.onData(e => {
+  // TODO 30JAN2021 clean up this usgly switch
   switch (e) {
-    // case '\r': // Enter
-    // case '\u0003': // Ctrl+C
-    //   prompt(term);
-    //   break;
-    // case '\u007F': // Backspace (DEL)
-    //   // Do not delete the prompt
-    //   if (term._core.buffer.x > 2) {
-    //     term.write('\b \b');
-    //   }
-    //   break;
-    default: // Print all other characters for demo
+    default:
+      // if there's no serialport, print red error text
+      // TODO 30JAN2021 could / should this be
       if (port === null) {
         document.getElementById('errorOut').textContent = 'Error: not connected';
         document.getElementById('errorOut').className = 'settingsError';
         console.log('Error: not connected')
       }
+      // if a serial port exists
       else {
+        // on enter key
+        // TODO 30JAN2021 test on darwin in particular
         if (e == '\r') {
           // TODO 21JAN2021 desire buffer to log
+          // send to serialport the user selected enter type
           port.write(enterStr);
-          console.log(logOn)
+          // if user has chosen logging
           if (logOn) {
+            // log timestamp in this format: 1611249752027
+            // TODO 30JAN2021 add date to timestamp
             now = new Date().getTime()
+            // concatenate time stamp comma separated from user input line
             temp = now + ',' + logBuf + '\r\n';
+            // flush concatenated line to log.csv
+            // TODO 30JAN2021 name logs with date then append -001, -002 for each logging session
             fs.appendFile('log.csv', temp, function (err) {
               if (err) throw err;
             });
           }
+          // clear user input line buffer
           logBuf = '';
         }
-        else if (e == '\u007f') { // backspace
-          if (term._core.buffer.x > 0) { // if any characters in line buffer
+        // if user types backspace 
+        // TODO 30JAN2021 check on darwin
+        else if (e == '\u007f') {
+          // if there are any characters in on the term screen, delete them
+          if (term._core.buffer.x > 0) {
             term.write('\b \b');
           }
         }
+        // else a character other than enter or backspace
         else {
+          // send character to serialport
           port.write(e)
+          // if local echo turned on
           if (echoOn) {
+            // print local echo to terminal
             term.write(e)
           }
+          // add character to local line buffer used for loggin
           logBuf += e;
         }
       }
   }
 });
 
+// open terminal in html
 term.open(document.getElementById('terminal'));
+// find available serialports
 listPorts();
 

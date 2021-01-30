@@ -112,6 +112,8 @@ term.attachCustomKeyEventHandler(function (e) {
 });
 
 function listPorts() {
+  // print header to term
+  term.write('\x1B[2mserial ports detected:\r\n')
   // for each serial port detected
   SerialPort.list().then(ports => {
     var select = document.getElementById('portSelect');
@@ -124,12 +126,22 @@ function listPorts() {
       console.log(port.pnpId);
       console.log(port.manufacturer);
 
+      // print port to term
+      term.write('\r\n');
+      term.write(port.path);
+      term.write(' ');
+      term.write(port.manufacturer);
+      term.write(' ');
+      term.write(port.pnpId);
+      term.write('\r\n');
+
       // add port path to serial selector
       var el = document.createElement('option');
       el.textContent = port.path;
       el.value = port.path;
       select.appendChild(el);
     });
+    term.write('\x1B[0m\r\n');
     // TODO 21JAN2021 add loopback?
 
     // after ports are listed, now restore all persistent settings
@@ -303,8 +315,8 @@ term.onData(e => {
         }
         else if (e == '\u007f') { // backspace
           if (term._core.buffer.x > 0) { // if any characters in line buffer
-              term.write('\b \b');
-            }
+            term.write('\b \b');
+          }
         }
         else {
           port.write(e)

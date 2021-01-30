@@ -36,8 +36,10 @@ menu.append(new MenuItem({
   submenu: [{
     label: 'Copy',
     role: 'copy',
-    accelerator: process.platform === 'darwin' ? 'cmd+shift+c' : 'ctrl+shift+c'},
-    {label: 'Paste',
+    accelerator: process.platform === 'darwin' ? 'cmd+shift+c' : 'ctrl+shift+c'
+  },
+  {
+    label: 'Paste',
     role: 'paste',
     accelerator: process.platform === 'darwin' ? 'cmd+shift+v' : 'ctrl+shift+v',
   }]
@@ -46,18 +48,55 @@ menu.append(new MenuItem({
   label: 'Terminal',
   submenu: [{
     label: 'Start / Stop',
-    click() { 
-        if (document.getElementById('connectBox').checked) {
-          document.getElementById('connectBox').checked = false;
-        }
-        else {
-          document.getElementById('connectBox').checked = true;
-        }
-        term.focus()
-        changeConnect(document.getElementById('connectBox'));
-        // NAG 22 JAN 2021 needs focus after key command, needs 
-     },
-    accelerator: process.platform === 'darwin' ? 'cmd+shift+s' : 'ctrl+shift+s',
+    click() {
+      if (document.getElementById('connectBox').checked) {
+        document.getElementById('connectBox').checked = false;
+      }
+      else {
+        document.getElementById('connectBox').checked = true;
+      }
+      term.focus()
+      changeConnect(document.getElementById('connectBox'));
+    },
+    accelerator: process.platform === 'darwin' ? 'cmd+shift+s' : 'ctrl+shift+s'
+  },
+  {
+    label: 'Refresh Ports',
+    click() {
+      term.focus()
+      refreshPorts();
+    },
+    accelerator: process.platform === 'darwin' ? 'cmd+shift+r' : 'ctrl+shift+r'
+  },
+  {
+    label: 'Log',
+    click() {
+      if (document.getElementById('logBox').checked) {
+        document.getElementById('logBox').checked = false;
+      }
+      else {
+        document.getElementById('logBox').checked = true;
+      }
+      term.focus()
+      changeLog(document.getElementById('logBox'));
+    },
+    accelerator: process.platform === 'darwin' ? 'cmd+shift+l' : 'ctrl+shift+l'
+  },
+  {
+    label: 'Echo',
+    click() {
+      if (document.getElementById('echoBox').checked) {
+        document.getElementById('echoBox').checked = false;
+      }
+      else {
+        document.getElementById('echoBox').checked = true;
+      }
+      term.focus()
+      changeEcho(document.getElementById('logBox'));
+      // NAG 22 JAN 2021 needs focus after key command, needs 
+    },
+    accelerator: process.platform === 'darwin' ? 'cmd+shift+e' : 'ctrl+shift+e',
+
   }]
 }))
 
@@ -177,8 +216,8 @@ function changeLog(checkbox) {
 }
 
 function clearErrors() {
-  document.getElementById('errorOut').textContent='';
-  document.getElementById('errorOut').className='settingsBar';
+  document.getElementById('errorOut').textContent = '';
+  document.getElementById('errorOut').className = 'settingsBar';
 }
 
 function restoreSettings() {
@@ -205,9 +244,9 @@ function changeConnect(checkbox) {
     port.on('error', function (err) { console.log('Error: ', err.message) })
     port.on('close', function (err) {
       if (isConnected) {
-      document.getElementById('errorOut').textContent='Error: ' + portStr + ' not available';
-      document.getElementById('errorOut').className='settingsError';
-      document.getElementById('connectBox').checked = false;
+        document.getElementById('errorOut').textContent = 'Error: ' + portStr + ' not available';
+        document.getElementById('errorOut').className = 'settingsError';
+        document.getElementById('connectBox').checked = false;
         console.log('uncaughtException: ', err.message);
         console.log('Error: ' + portStr + ' not available');
       }
@@ -239,13 +278,13 @@ term.onData(e => {
     // case '\u007F': // Backspace (DEL)
     //   // Do not delete the prompt
     //   if (term._core.buffer.x > 2) {
-      //     term.write('\b \b');
-      //   }
-      //   break;
-      default: // Print all other characters for demo
+    //     term.write('\b \b');
+    //   }
+    //   break;
+    default: // Print all other characters for demo
       if (port === null) {
-        document.getElementById('errorOut').textContent='Error: not connected';
-        document.getElementById('errorOut').className='settingsError';
+        document.getElementById('errorOut').textContent = 'Error: not connected';
+        document.getElementById('errorOut').className = 'settingsError';
         console.log('Error: not connected')
       }
       else {
@@ -275,10 +314,9 @@ term.onData(e => {
           logBuf += e;
         }
       }
-    }
-  });
-  
-  term.open(document.getElementById('terminal'));
-  listPorts();
-  
-  
+  }
+});
+
+term.open(document.getElementById('terminal'));
+listPorts();
+

@@ -311,67 +311,56 @@ function changeConnect(checkbox) {
 
 // upon new data to terminal
 // TODO 30JAN2021 refactor e variable to a better name
-term.onData(e => {
-  // TODO 30JAN2021 clean up this usgly switch
-  switch (e) {
-    default:
-      // if there's no serialport, print red error text
-      // TODO 30JAN2021 could / should this be
-      if (port === null) {
-        document.getElementById('errorOut').textContent = 'Error: not connected';
-        document.getElementById('errorOut').className = 'settingsError';
-        console.log('Error: not connected')
-      }
-      // if a serial port exists
-      else {
-        // on enter key
-        // TODO 30JAN2021 test on darwin in particular
-        if (e == '\r') {
-          // TODO 21JAN2021 desire buffer to log
-          // send to serialport the user selected enter type
-          port.write(enterStr);
-          // if user has chosen logging
-          if (logOn) {
-            // log timestamp in this format: 1611249752027
-            // TODO 30JAN2021 add date to timestamp
-            now = new Date().getTime()
-            // concatenate time stamp comma separated from user input line
-            temp = now + ',' + logBuf + '\r\n';
-            // flush concatenated line to log.csv
-            // TODO 30JAN2021 name logs with date then append -001, -002 for each logging session
-            fs.appendFile('log.csv', temp, function (err) {
-              if (err) throw err;
-            });
-          }
+term.onData(charIn => {
+  // if there's no serialport, print red error text
+  if (port === null) {
+    document.getElementById('errorOut').textContent = 'Error: not connected';
+    document.getElementById('errorOut').className = 'settingsError';
+    console.log('Error: not connected')
+  }
+  // if a serial port exists
+  else {
+    switch (charIn) {
+      case '\u007f':
+        if (term._core.buffer.x > 0) {
+          term.write('\b \b');
+        }
+        break;
+      case '\r':
+        // send to serialport the user selected enter type
+        port.write(enterStr);
+        // if user enabled logging
+        if (logOn) {
+          // log timestamp in this format: 1611249752027
+          // TODO 30JAN2021 add date to timestamp
+          now = new Date().getTime()
+          // concatenate time stamp comma separated from user input line
+          temp = now + ',' + logBuf + '\r\n';
+          // flush concatenated line to log.csv
+          // TODO 30JAN2021 name logs with date then append -001, -002 for each logging session
+          fs.appendFile('log.csv', temp, function (err) {
+            if (err) throw err;
+          });
           // clear user input line buffer
-          logBuf = '';
         }
-        // if user types backspace 
-        // TODO 30JAN2021 check on darwin
-        else if (e == '\u007f') {
-          // if there are any characters in on the term screen, delete them
-          if (term._core.buffer.x > 0) {
-            term.write('\b \b');
-          }
+        logBuf = '';
+        break;
+      default:
+        // send character to serialport
+        port.write(charIn)
+        // if local echo turned on
+        if (echoOn) {
+          // print local echo to terminal
+          term.write(charIn)
         }
-        // else a character other than enter or backspace
-        else {
-          // send character to serialport
-          port.write(e)
-          // if local echo turned on
-          if (echoOn) {
-            // print local echo to terminal
-            term.write(e)
-          }
-          // add character to local line buffer used for loggin
-          logBuf += e;
-        }
-      }
+        // add character to local line buffer used for logging
+        logBuf += charIn;
+    }
   }
 });
 
 // open terminal in html
 term.open(document.getElementById('terminal'));
-// find available serialports
+// find available serial ports
 listPorts();
 

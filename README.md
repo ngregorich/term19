@@ -9,7 +9,7 @@ An electron based serial terminal focused on a streamlined workflow
 
 ## Downloading
 
-[v0.0.1](https://drive.google.com/file/d/1UQ8NOF8o5JViOawQrFrpKXQ_qp0Bykh7/view?usp=sharing) portable .zip binary for win32 and x64
+[v0.0.1](https://drive.google.com/file/d/1UQ8NOF8o5JViOawQrFrpKXQ_qp0Bykh7/view?usp=sharing) portable binary .zip for win32 and x64 (60 MB)
 
 ## Background
 

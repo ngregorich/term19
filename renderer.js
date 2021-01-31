@@ -136,7 +136,7 @@ function listPorts() {
       term.write(port.path);
       term.write(' ');
       term.write(port.manufacturer);
-      term.write(' ');
+      term.write('\r\n');
       term.write(port.pnpId);
       term.write('\r\n');
 

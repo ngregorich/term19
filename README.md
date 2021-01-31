@@ -11,11 +11,11 @@ An electron based serial terminal focused on a streamlined workflow
 
 [v0.0.1](https://drive.google.com/file/d/1UQ8NOF8o5JViOawQrFrpKXQ_qp0Bykh7/view?usp=sharing) portable binary .zip for win32 and x64 (60 MB)
 
-Unzip and double click term19.exe to run.
+Unzip and double click *term19.exe* to run.
 
 ## Background
 
-I am a hardware engineer. I use serial ports. A lot. Yes, still in 2021.
+I am a hardware engineer. I use serial ports. *A lot*. Yes, still in 2021.
 
 The interface between a user and a device connected to a serial port is typically a serial terminal. Some popular serial terminals are:
 - [PuTTY](https://www.chiark.greenend.org.uk/~sgtatham/putty/) - Windows
@@ -26,7 +26,7 @@ The interface between a user and a device connected to a serial port is typicall
 - [Serial](https://www.decisivetactics.com/products/serial/) - macOS
 - [GNU Screen](https://www.gnu.org/software/screen/) - macOS / Linux
 
-This project started out as an evaluation of whether [Node.js](https://nodejs.org/en/) was a reasonable alternative to [Python](https://www.python.org/) to create deployable serial port automation, logging, and data visualization applications. The JavaScript folks seem to be super productive *and* having fun. Could I? \[Spoiler: yes.\]
+This project started out as an evaluation of whether [Node.js](https://nodejs.org/en/) was a reasonable alternative to [Python](https://www.python.org/) to create deployable serial port automation, logging, and data visualization applications. The JavaScript folks seem to be super productive *and* having fun. Could I? \[*Spoiler: yes.*\]
 
 There are seemingly [many](https://xtermjs.org/) SSH and terminal sharing Node.js projects, but none for serial ports.
 
@@ -51,7 +51,7 @@ What problems am I trying to solve (*or create?*) with term19? Feel free to fram
 - I want a clean UI and UX
     - Throw in some error messages
 - I want my terminal to be reliable and performant
-- I want my terminal to be cross platform (untested)
+- I want my terminal to be cross platform
 
 And: *As a developer*...
 

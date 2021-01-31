@@ -3,7 +3,9 @@ An electron based serial terminal focused on a streamlined workflow
 
 ## Screenshots
 
-TODO 30JAN2021 upload screenshot(s), add link
+![hello_world](https://user-images.githubusercontent.com/44035038/106377024-d493ff80-634e-11eb-9e58-77e91453e33f.png)
+
+![terminal_menu](https://user-images.githubusercontent.com/44035038/106377078-48360c80-634f-11eb-903d-ccdb4ef6ad94.png)
 
 ## Downloading binaries
 

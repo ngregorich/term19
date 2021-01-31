@@ -22,7 +22,7 @@ The interface between a user and a device connected to a serial port is typicall
 - [Serial](https://www.decisivetactics.com/products/serial/) - macOS
 - [GNU Screen](https://www.gnu.org/software/screen/) - macOS / Linux
 
-This project started out as an evaluation of whether [Node.js](https://nodejs.org/en/) was a reasonable alternative to [Python](https://www.python.org/) to create deployable serial port automation, logging, and data visualization applications. The JavaScript guys seem to be super productive *and* having fun. Could I? \[Spoiler: yes.\]
+This project started out as an evaluation of whether [Node.js](https://nodejs.org/en/) was a reasonable alternative to [Python](https://www.python.org/) to create deployable serial port automation, logging, and data visualization applications. The JavaScript folks seem to be super productive *and* having fun. Could I? \[Spoiler: yes.\]
 
 There are seemingly [many](https://xtermjs.org/) SSH and terminal sharing Node.js projects, but none for serial ports were found.
 

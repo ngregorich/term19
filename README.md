@@ -11,6 +11,8 @@ An electron based serial terminal focused on a streamlined workflow
 
 [v0.0.1](https://drive.google.com/file/d/1UQ8NOF8o5JViOawQrFrpKXQ_qp0Bykh7/view?usp=sharing) portable binary .zip for win32 and x64 (60 MB)
 
+Unzip and double click term19.exe to run.
+
 ## Background
 
 I am a hardware engineer. I use serial ports. A lot. Yes, still in 2021.
@@ -75,11 +77,14 @@ Small utilities also make life easier:
 
 And finally:
 
-- [VisualStudio Code](https://code.visualstudio.com/) - a *does everything* text editor
+- [Visual Studio Code](https://code.visualstudio.com/) - a *does everything* text editor
 
 ### Building from source
 
-TODO 30JAN2021 write instructions
+1. Clone this repo: ```git clone git@github.com:ngregorich/term19.git```
+1. Run ```npm install``` to install term19 dependencies
+1. Run ```npm start``` to run the application
+1. *Optionally* run ```electron packager .``` to bundle the Electron application
 
 ### Contributing
 

@@ -9,7 +9,7 @@ An electron based serial terminal focused on a streamlined workflow
 
 ## Downloading binaries
 
-TODO 30JAN2021 create release binary, add link
+[v0.0.1](https://drive.google.com/file/d/1UQ8NOF8o5JViOawQrFrpKXQ_qp0Bykh7/view?usp=sharing) for win32 and x64
 
 ## Background
 

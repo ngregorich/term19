@@ -7,9 +7,9 @@ An electron based serial terminal focused on a streamlined workflow
 
 ![terminal_menu](https://user-images.githubusercontent.com/44035038/106377078-48360c80-634f-11eb-903d-ccdb4ef6ad94.png)
 
-## Downloading binaries
+## Downloading
 
-[v0.0.1](https://drive.google.com/file/d/1UQ8NOF8o5JViOawQrFrpKXQ_qp0Bykh7/view?usp=sharing) for win32 and x64
+[v0.0.1](https://drive.google.com/file/d/1UQ8NOF8o5JViOawQrFrpKXQ_qp0Bykh7/view?usp=sharing) portable .zip binary for win32 and x64
 
 ## Background
 

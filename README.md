@@ -86,6 +86,20 @@ And finally:
 1. Run ```npm start``` to run the application
 1. *Optionally* run ```electron packager .``` to bundle the Electron application
 
+### Known issues
+
+The code has a number of TODO items which include include:
+
+- Testing on and packaging for macOS and Linux
+- Adding a loopback serial port for demo and debug
+- Adding tests
+- Storing each logged run as with a name in log-date-run.csv format
+- Supporting window resizing
+- *Possibly* supporting data frame sizes other than 8 bits 
+- *Possibly* supporting parity bits
+- *Possibly* supporting stop bit sizes other than 1 bit
+- *Possibly* supporting color customization
+
 ### Contributing
 
 Bug reports and pull requests are welcome.

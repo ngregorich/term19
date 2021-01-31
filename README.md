@@ -24,7 +24,7 @@ The interface between a user and a device connected to a serial port is typicall
 
 This project started out as an evaluation of whether [Node.js](https://nodejs.org/en/) was a reasonable alternative to [Python](https://www.python.org/) to create deployable serial port automation, logging, and data visualization applications. The JavaScript folks seem to be super productive *and* having fun. Could I? \[Spoiler: yes.\]
 
-There are seemingly [many](https://xtermjs.org/) SSH and terminal sharing Node.js projects, but none for serial ports were found.
+There are seemingly [many](https://xtermjs.org/) SSH and terminal sharing Node.js projects, but none for serial ports.
 
 ### Goals
 
@@ -33,14 +33,14 @@ What problems am I trying to solve (*or create?*) with term19? Feel free to fram
 - I want to select my serial port from a *refreshable* pull down menu
     - I don't want to have to go to to the Device Manager or list the dev tree to see what ports are available
 - I don't want to have to dig even deeper to sort out which serial port is which device
-    - Was COM4 my PyBoard and COM3 my FTDI cable?! *Groan*
+    - Was COM3 my pyboard and COM4 my FTDI cable?! *Groan*
 - I want my terminal to remember which serial port I am connected to, even when the application is closed
     - On that note, I want my terminal to remember the baud rate and all of the other settings, even when the application is closed
 - I want easy to remember copy and paste key commands, that don't interfere with things like sending a *ctrl + c* / ASCII 0x03 / ETX character
-- Add a key command to connect to the serial port, I want to be quick!
+- I want to open the terminal and connect with 1 key command (or click)
     - OK, I want key commands for *all the things*!
 - I want to be able to quickly see which serial port I am connected to and at what baud rate
-- I want flexible enter key behavior, sometimes LF, sometimes CR, sometimes both!
+- I want flexible enter key behavior: sometimes LF, sometimes CR, sometimes both!
 - I want an option for local echo (echo), in case my equipment doesn't chat back
 - I want to be able to save my session to a log file
     - Some timestamps would be nice

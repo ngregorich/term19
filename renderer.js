@@ -316,14 +316,16 @@ term.onData(charIn => {
   if (port === null) {
     document.getElementById('errorOut').textContent = 'Error: not connected';
     document.getElementById('errorOut').className = 'settingsError';
-    console.log('Error: not connected')
+    console.log('Error: not connected');
+    charInCount = 0;
   }
   // if a serial port exists
   else {
     switch (charIn) {
       case '\u007f':
-        if (term._core.buffer.x > 0) {
+        if (charInCount > 0) {
           term.write('\b \b');
+          charInCount -= 1;
         }
         break;
       case '\r':
@@ -341,9 +343,10 @@ term.onData(charIn => {
           fs.appendFile('log.csv', temp, function (err) {
             if (err) throw err;
           });
-          // clear user input line buffer
         }
+        // clear user input line buffer
         logBuf = '';
+        charInCount = 0;
         break;
       default:
         // send character to serialport
@@ -355,6 +358,7 @@ term.onData(charIn => {
         }
         // add character to local line buffer used for logging
         logBuf += charIn;
+        charInCount += 1;
     }
   }
 });

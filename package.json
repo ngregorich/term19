@@ -1,6 +1,6 @@
 {
     "name": "term19",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "An Electron serial terminal",
     "main": "main.js",
     "scripts": {
